@@ -28,7 +28,7 @@ install_postgresql() {
 	echo "Installing PostgreSQL"
 	sudo apt install postgresql postgresql-client -y
 	sudo su - postgres -c "createuser $USER"
-	createdb $USER
+	sudo su - postgres -c "createdb $USER"
 	echo "Installed PostgreSQL successfully"
 }
 
