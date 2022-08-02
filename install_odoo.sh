@@ -1,7 +1,6 @@
 #! /bin/bash
 
 GITHUB_PAT=""
-OE_USER="odoo"
 
 fetch_sources() {
 	echo "Fetching the sources"
@@ -28,8 +27,8 @@ install_python() {
 install_postgresql() {
 	echo "Installing PostgreSQL"
 	sudo apt install postgresql postgresql-client -y
-	sudo su - postgres -c "createuser $OE_USER"
-	createdb $OE_USER
+	sudo su - postgres -c "createuser $USER"
+	createdb $USER
 	echo "Installed PostgreSQL successfully"
 }
 
