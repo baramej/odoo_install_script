@@ -18,7 +18,7 @@ println() {
 
 install_dependencies() {
 	apt update && apt upgrade -y
-	apt install postgresql postgresql-client -y
+	apt install postgresql postgresql-client wkhtmltopdf -y
 }
 
 install_odoo() {
