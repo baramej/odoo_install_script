@@ -19,10 +19,8 @@ fetch_sources() {
 }
 
 install_python() {
-	sudo apt install software-properties-common -y
-	sudo add-apt-repository ppa:deadsnakes/ppa -y
-	sudo apt install python3.7 python3.7-distutils python3.7-dev \
-		python3-pip libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev \
+	sudo apt install python3 python3-dev python3-pip python3-wheel python3-distutils \
+		build-essential wget libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev \
 		libtiff5-dev libjpeg8-dev libopenjp2-7-dev zlib1g-dev libfreetype6-dev \
 		liblcms2-dev libwebp-dev libharfbuzz-dev libfribidi-dev libxcb1-dev libpq-dev -y
 }
@@ -35,14 +33,22 @@ install_postgresql() {
 
 install_odoo_dependencies() {
 	cd ./odoo
-	python3.7 -m pip install setuptools wheel
-	python3.7 -m pip install -r requirements.txt
+	pip3 install setuptools wheel
+	pip3 install -r requirements.txt
 	cd ..
 }
 
 install_node_and_rtlcss() {
 	sudo apt install nodejs npm -y
 	sudo npm install -g rtlcss
+}
+
+install_Wkhtmltopdf() {
+	local URL = "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.$(lsb_release -c -s)_amd64.deb"
+	sudo wget $URL
+	sudo gdebi --n `basename $URL`
+	sudo ln -s /usr/local/bin/wkhtmltopdf /usr/bin
+	sudo ln -s /usr/local/bin/wkhtmltoimage /usr/bin
 }
 
 # Change the directory to user's home
@@ -67,3 +73,7 @@ install_odoo_dependencies
 # Install nodejs and rtlcss
 println "Installing Nodejs and rtlcss"
 install_node_and_rtlcss
+
+# Install Wkhtmltopdf
+println "Installing Wkhtmltopdf"
+install_Wkhtmltopdf
