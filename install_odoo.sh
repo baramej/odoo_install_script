@@ -44,11 +44,7 @@ install_node_and_rtlcss() {
 }
 
 install_Wkhtmltopdf() {
-	local URL = "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.$(lsb_release -c -s)_amd64.deb"
-	sudo wget $URL
-	sudo gdebi --n `basename $URL`
-	sudo ln -s /usr/local/bin/wkhtmltopdf /usr/bin
-	sudo ln -s /usr/local/bin/wkhtmltoimage /usr/bin
+	sudo apt install wkhtmltopdf -y
 }
 
 # Change the directory to user's home
