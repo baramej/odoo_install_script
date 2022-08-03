@@ -1,6 +1,11 @@
 #! /bin/bash
 
-echo -en "Enter your Github Personal Access Token: "
+if [[ $EUID -ne 0 ]]; then
+   echo -e "\033[0;31mThis script must be run as root\033[0m"
+   exit 1
+fi
+
+echo -n "Enter your Github Personal Access Token: "
 read GITHUB_PAT
 
 print() {
@@ -11,65 +16,33 @@ println() {
 	echo -e "\033[0;31m$1\033[0m"
 }
 
-fetch_sources() {
-	git clone "https://github.com/odoo/odoo.git" --depth 1 -b 15.0
+install_dependencies() {
+	apt update && apt upgrade -y
+	apt install postgresql postgresql-client -y
+}
+
+install_odoo() {
+	wget -O - https://nightly.odoo.com/odoo.key | apt-key add -
+	echo "deb http://nightly.odoo.com/15.0/nightly/deb/ ./" >> /etc/apt/sources.list.d/odoo.list
+	apt install odoo -y	
+}
+
+fetch_enterprise_addons() {
+	cd /usr/lib/python3/dist-packages
 	git clone "https://isyedaliraza:$GITHUB_PAT@github.com/odoo/enterprise.git" --depth 1 -b 15.0
-	mv ./enterprise/* ./odoo/addons
-	rm -rf ./enterprise
 }
 
-install_python() {
-	sudo apt install python3 python3-dev python3-pip python3-wheel python3-distutils \
-		build-essential wget libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev \
-		libtiff5-dev libjpeg8-dev libopenjp2-7-dev zlib1g-dev libfreetype6-dev \
-		liblcms2-dev libwebp-dev libharfbuzz-dev libfribidi-dev libxcb1-dev libpq-dev -y
+edit_odoo_conf() {
+	cd /etc/odoo/
+	sed -i 's/workers = 0/workers = 1/' odoo.conf
+	sed -i 's/list_db = True/list_db = False/' odoo.conf
 }
 
-install_postgresql() {
-	sudo apt install postgresql postgresql-client -y
-	sudo su - postgres -c "createuser $USER"
-	sudo su - postgres -c "createdb $USER"
-}
+println "Installing dependencies"
+install_dependencies
 
-install_odoo_dependencies() {
-	cd ./odoo
-	pip3 install setuptools wheel
-	pip3 install -r requirements.txt
-	cd ..
-}
+println "Installing Odoo 15"
+install_odoo
 
-install_node_and_rtlcss() {
-	sudo apt install nodejs npm -y
-	sudo npm install -g rtlcss
-}
-
-install_Wkhtmltopdf() {
-	sudo apt install wkhtmltopdf -y
-}
-
-# Change the directory to user's home
-cd ~
-
-# Fetch odoo sources from Github
-println "Fetching Odoo sources from Github"
-fetch_sources
-
-# Install python with dependencies
-println "Installing Python3.7 and dependencies"
-install_python
-
-# Install postgresql
-println "Installing Postgresql"
-install_postgresql
-
-# Install Odoo dependencies
-println "Installing Odoo dependencies"
-install_odoo_dependencies
-
-# Install nodejs and rtlcss
-println "Installing Nodejs and rtlcss"
-install_node_and_rtlcss
-
-# Install Wkhtmltopdf
-println "Installing Wkhtmltopdf"
-install_Wkhtmltopdf
+println "Fetching Odoo 15 enterprise addons"
+fetch_enterprise_addons
