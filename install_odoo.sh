@@ -1,6 +1,15 @@
 #! /bin/bash
 
-GITHUB_PAT=""
+echo -en "Enter your Github Personal Access Token: "
+read GITHUB_PAT
+
+print() {
+	echo -en "\033[0;31m$1\033[0m"
+}
+
+println() {
+	echo -e "\033[0;31m$1\033[0m"
+}
 
 fetch_sources() {
 	git clone "https://github.com/odoo/odoo.git" --depth 1 -b 15.0
@@ -36,8 +45,25 @@ install_node_and_rtlcss() {
 	sudo npm install -g rtlcss
 }
 
+# Change the directory to user's home
+cd ~
+
+# Fetch odoo sources from Github
+println "Fetching Odoo sources from Github"
 fetch_sources
+
+# Install python with dependencies
+println "Installing Python3.7 and dependencies"
 install_python
+
+# Install postgresql
+println "Installing Postgresql"
 install_postgresql
+
+# Install Odoo dependencies
+println "Installing Odoo dependencies"
 install_odoo_dependencies
+
+# Install nodejs and rtlcss
+println "Installing Nodejs and rtlcss"
 install_node_and_rtlcss
